@@ -35,10 +35,30 @@ contains
         integer                             :: iRetCode
         
         ! Locals
-        integer :: iErrCode
+        integer             :: iErrCode
+        character(len=4)    :: sID
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Try opening the file and checking it really is a Surfer 12 grid
+        open(iLUN, file=sFileName, status='old', action='read', access='scratch'. iostat=iErrCode)
+        if(iErrCode /= 0) then
+            iRetCode = 1
+            return
+        end if
+        read(iLUN, iostat=iErrCode) sID
+        if(iErrCode /= 0) then
+            iRetCode = 2
+            return
+        end if
+        if(sID /= "DSRB") then
+            iRetCode = 3
+            return
+        end if
+        
+        ! Leave
+        close(iLUN)
         
     end function fileRead
     
