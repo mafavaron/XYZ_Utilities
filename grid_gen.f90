@@ -12,6 +12,7 @@ module grid_gen
     
     type grid_space
         character(len=256)                  :: sDataFileName
+        integer                             :: iVersion
         real(8)                             :: rDeltaX
         real(8)                             :: rDeltaY
         integer                             :: iNx
@@ -65,6 +66,17 @@ contains
         iLength = iLength / 4
         if(iLength /= 1) then
             iRetCode = 5
+            return
+        end if
+        
+        ! Get GRD version (should be 2)
+        read(iLUN, iostat=iErrCode) this % iVersion
+        if(iErrCode /= 0) then
+            iRetCode = 6
+            return
+        end if
+        if(this % iVersion /= 1) then
+            iRetCode = 7
             return
         end if
         
