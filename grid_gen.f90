@@ -163,7 +163,17 @@ contains
         allocate(this % rvZ(this % iNx * this % iNy))
         
         ! Get actual data
-        print *, this % rInvalid
+        read(iLUN, iostat=iErrCode) sID
+        if(iErrCode /= 0) then
+            iRetCode = 18
+            close(iLUN)
+            return
+        end if
+        if(sID /= "DATA") then
+            iRetCode = 19
+            close(iLUN)
+            return
+        end if
         
         ! Leave
         close(iLUN)
