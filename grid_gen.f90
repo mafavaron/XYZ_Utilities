@@ -125,7 +125,13 @@ contains
             close(iLUN)
             return
         end if
-        print *, this % rX0, this % rY0
+        read(iLUN, iostat=iErrCode) this % rDeltaX, this % rDeltaY
+        if(iErrCode /= 0) then
+            iRetCode = 14
+            close(iLUN)
+            return
+        end if
+        print *, this % rDeltaX, this % rDeltaY
         
         ! Leave
         close(iLUN)
