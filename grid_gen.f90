@@ -21,6 +21,8 @@ module grid_gen
         real(8)                             :: rZmax
         integer                             :: iNx
         integer                             :: iNy
+        real(8)                             :: rInvalid
+        real(8)                             :: rHold
         real(8), dimension(:), allocatable  :: rvX
         real(8), dimension(:), allocatable  :: rvY
         real(8), dimension(:), allocatable  :: rvZ
@@ -43,6 +45,8 @@ contains
         integer             :: iErrCode
         character(len=4)    :: sID
         integer             :: iLength
+        integer             :: iX, iY
+        integer             :: k
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -139,7 +143,56 @@ contains
             close(iLUN)
             return
         end if
-        print *, this % rZmin, this % rZmax
+        read(iLUN, iostat=iErrCode) this % rHold
+        if(iErrCode /= 0) then
+            iRetCode = 16
+            close(iLUN)
+            return
+        end if
+        read(iLUN, iostat=iErrCode) this % rInvalid
+        if(iErrCode /= 0) then
+            iRetCode = 17
+            close(iLUN)
+            return
+        end if
+        
+        ! Reserve workspace
+        if(allocated(this % rvX)) deallocate(this % rvX)
+        if(allocated(this % rvY)) deallocate(this % rvY)
+        if(allocated(this % rvZ)) deallocate(this % rvZ)
+        allocate(this % rvX(this % iNx * this % iNy))
+        allocate(this % rvY(this % iNx * this % iNy))
+        allocate(this % rvZ(this % iNx * this % iNy))
+        
+        ! Get actual data
+        read(iLUN, iostat=iErrCode) sID
+        if(iErrCode /= 0) then
+            iRetCode = 18
+            close(iLUN)
+            return
+        end if
+        if(sID /= "DATA") then
+            iRetCode = 19
+            close(iLUN)
+            return
+        end if
+        read(iLUN, iostat=iErrCode) iLength
+        if(iErrCode /= 0) then
+            iRetCode = 20
+            close(iLUN)
+            return
+        end if
+        if(iLength/8 /= this % iNx * this % iNy) then
+            iRetCode = 21
+            close(iLUN)
+            return
+        end if
+        k = 0
+        do iY = 1, this % iNy
+            do iX = 1, this % iNx
+                k = k + 1
+            end do
+        end do
         
         ! Leave
         close(iLUN)
