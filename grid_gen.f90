@@ -6,6 +6,8 @@ module grid_gen
     
     ! Public interface
     
+    public  :: grid_space
+    
     ! Data types
     
     type grid_space
@@ -17,6 +19,9 @@ module grid_gen
         real(8), dimension(:), allocatable  :: rvX
         real(8), dimension(:), allocatable  :: rvY
         real(8), dimension(:), allocatable  :: rvZ
+    contains
+        procedure, public                   :: fileRead
+        procedure, public                   :: fileWrite
     end type grid_space
     
 contains
