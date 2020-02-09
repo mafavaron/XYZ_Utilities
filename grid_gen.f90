@@ -174,6 +174,13 @@ contains
             close(iLUN)
             return
         end if
+        read(iLUN, iostat=iErrCode) iLength
+        if(iErrCode /= 0) then
+            iRetCode = 20
+            close(iLUN)
+            return
+        end if
+        print *, iLength/8 - this % iNx * this % iNy
         
         ! Leave
         close(iLUN)
