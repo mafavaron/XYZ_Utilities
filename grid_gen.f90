@@ -75,7 +75,7 @@ contains
             iRetCode = 6
             return
         end if
-        if(this % iVersion /= 1) then
+        if(this % iVersion /= 2) then
             iRetCode = 7
             return
         end if
