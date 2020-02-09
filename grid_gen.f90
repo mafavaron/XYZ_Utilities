@@ -44,7 +44,7 @@ contains
         iRetCode = 0
         
         ! Try opening the file and checking it really is a Surfer 12 grid
-        open(iLUN, file=sFileName, status='old', action='read', access='scratch', iostat=iErrCode)
+        open(iLUN, file=sFileName, status='old', action='read', access='stream', iostat=iErrCode)
         if(iErrCode /= 0) then
             iRetCode = 1
             return
@@ -75,7 +75,7 @@ contains
             iRetCode = 6
             return
         end if
-        if(this % iVersion /= 1) then
+        if(this % iVersion /= 2) then
             iRetCode = 7
             return
         end if
