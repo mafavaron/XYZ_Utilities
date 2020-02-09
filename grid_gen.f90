@@ -141,12 +141,28 @@ contains
             close(iLUN)
             return
         end if
-        read(iLUN, iostat=iErrCode) this % rInvalid
+        read(iLUN, iostat=iErrCode) this % rHold
         if(iErrCode /= 0) then
             iRetCode = 16
             close(iLUN)
             return
         end if
+        read(iLUN, iostat=iErrCode) this % rInvalid
+        if(iErrCode /= 0) then
+            iRetCode = 17
+            close(iLUN)
+            return
+        end if
+        
+        ! Reserve workspace
+        if(allocated(this % rvX)) deallocate(this % rvX)
+        if(allocated(this % rvY)) deallocate(this % rvY)
+        if(allocated(this % rvZ)) deallocate(this % rvZ)
+        allocate(this % rvX(this % iNx * this % iNy))
+        allocate(this % rvY(this % iNx * this % iNy))
+        allocate(this % rvZ(this % iNx * this % iNy))
+        
+        ! Get actual data
         print *, this % rInvalid
         
         ! Leave
