@@ -22,7 +22,7 @@ module grid_gen
         integer                             :: iNx
         integer                             :: iNy
         real(8)                             :: rInvalid
-        real(8)                             :: rHold
+        real(8)                             :: rRotation
         real(8), dimension(:), allocatable  :: rvX
         real(8), dimension(:), allocatable  :: rvY
         real(8), dimension(:), allocatable  :: rvZ
@@ -143,7 +143,7 @@ contains
             close(iLUN)
             return
         end if
-        read(iLUN, iostat=iErrCode) this % rHold
+        read(iLUN, iostat=iErrCode) this % rRotation
         if(iErrCode /= 0) then
             iRetCode = 16
             close(iLUN)
