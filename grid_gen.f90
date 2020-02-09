@@ -26,4 +26,37 @@ module grid_gen
     
 contains
 
+    function fileRead(this, iLUN, sFileName) result(iRetCode)
+    
+        ! Routine arguments
+        class(grid_space), intent(inout)    :: this
+        integer, intent(in)                 :: iLUN
+        character(len=*), intent(in)        :: sFileName
+        integer                             :: iRetCode
+        
+        ! Locals
+        integer :: iErrCode
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+    end function fileRead
+    
+
+    function fileWrite(this, iLUN, sFileName) result(iRetCode)
+    
+        ! Routine arguments
+        class(grid_space), intent(inout)    :: this
+        integer, intent(in)                 :: iLUN
+        character(len=*), intent(in)        :: sFileName
+        integer                             :: iRetCode
+        
+        ! Locals
+        integer :: iErrCode
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+    end function fileWrite
+
 end module grid_gen
