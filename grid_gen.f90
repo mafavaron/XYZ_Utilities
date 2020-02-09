@@ -45,6 +45,8 @@ contains
         integer             :: iErrCode
         character(len=4)    :: sID
         integer             :: iLength
+        integer             :: iX, iY
+        integer             :: k
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -180,7 +182,17 @@ contains
             close(iLUN)
             return
         end if
-        print *, iLength/8 - this % iNx * this % iNy
+        if(iLength/8 /= this % iNx * this % iNy) then
+            iRetCode = 21
+            close(iLUN)
+            return
+        end if
+        k = 0
+        do iY = 1, this % iNy
+            do iX = 1, this % iNx
+                k = k + 1
+            end do
+        end do
         
         ! Leave
         close(iLUN)
