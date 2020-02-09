@@ -21,6 +21,8 @@ module grid_gen
         real(8)                             :: rZmax
         integer                             :: iNx
         integer                             :: iNy
+        real(8)                             :: rInvalid
+        real(8)                             :: rHold
         real(8), dimension(:), allocatable  :: rvX
         real(8), dimension(:), allocatable  :: rvY
         real(8), dimension(:), allocatable  :: rvZ
@@ -139,7 +141,13 @@ contains
             close(iLUN)
             return
         end if
-        print *, this % rZmin, this % rZmax
+        read(iLUN, iostat=iErrCode) this % rInvalid
+        if(iErrCode /= 0) then
+            iRetCode = 16
+            close(iLUN)
+            return
+        end if
+        print *, this % rInvalid
         
         ! Leave
         close(iLUN)
