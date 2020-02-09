@@ -22,7 +22,7 @@ module grid_gen
         integer                             :: iNx
         integer                             :: iNy
         real(8)                             :: rInvalid
-        real(8)                             :: rHold
+        real(8)                             :: rRotation
         real(8), dimension(:), allocatable  :: rvX
         real(8), dimension(:), allocatable  :: rvY
         real(8), dimension(:), allocatable  :: rvZ
@@ -47,6 +47,7 @@ contains
         integer             :: iLength
         integer             :: iX, iY
         integer             :: k
+        real(8)             :: rX, rY
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -143,7 +144,7 @@ contains
             close(iLUN)
             return
         end if
-        read(iLUN, iostat=iErrCode) this % rHold
+        read(iLUN, iostat=iErrCode) this % rRotation
         if(iErrCode /= 0) then
             iRetCode = 16
             close(iLUN)
@@ -189,8 +190,18 @@ contains
         end if
         k = 0
         do iY = 1, this % iNy
+            rY = this % rY0 + this % rDeltaY * (iY - 1)
             do iX = 1, this % iNx
+                rX = this % rX0 + this % rDeltaX * (iX - 1)
                 k = k + 1
+                this % rvX(k) = rX
+                this % rvY(k) = rY
+                read(iLUN, iostat=iErrCode) this % rvZ(k)
+                if(iErrCode /= 0) then
+                    iRetCode = 22
+                    close(iLUN)
+                    return
+                end if
             end do
         end do
         
