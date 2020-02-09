@@ -17,6 +17,8 @@ module grid_gen
         real(8)                             :: rY0
         real(8)                             :: rDeltaX
         real(8)                             :: rDeltaY
+        real(8)                             :: rZmin
+        real(8)                             :: rZmax
         integer                             :: iNx
         integer                             :: iNy
         real(8), dimension(:), allocatable  :: rvX
@@ -131,7 +133,13 @@ contains
             close(iLUN)
             return
         end if
-        print *, this % rDeltaX, this % rDeltaY
+        read(iLUN, iostat=iErrCode) this % rZmin, this % rZmax
+        if(iErrCode /= 0) then
+            iRetCode = 15
+            close(iLUN)
+            return
+        end if
+        print *, this % rZmin, this % rZmax
         
         ! Leave
         close(iLUN)
