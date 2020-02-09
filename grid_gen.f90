@@ -37,6 +37,7 @@ contains
         ! Locals
         integer             :: iErrCode
         character(len=4)    :: sID
+        integer             :: iLength
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -54,6 +55,16 @@ contains
         end if
         if(sID /= "DSRB") then
             iRetCode = 3
+            return
+        end if
+        read(iLUN, iostat=iErrCode) iLength
+        if(iErrCode /= 0) then
+            iRetCode = 4
+            return
+        end if
+        iLength = iLength / 4
+        if(iLength /= 1) then
+            iRetCode = 5
             return
         end if
         
