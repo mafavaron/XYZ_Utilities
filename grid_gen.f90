@@ -52,20 +52,24 @@ contains
         read(iLUN, iostat=iErrCode) sID
         if(iErrCode /= 0) then
             iRetCode = 2
+            close(iLUN)
             return
         end if
         if(sID /= "DSRB") then
             iRetCode = 3
+            close(iLUN)
             return
         end if
         read(iLUN, iostat=iErrCode) iLength
         if(iErrCode /= 0) then
             iRetCode = 4
+            close(iLUN)
             return
         end if
         iLength = iLength / 4
         if(iLength /= 1) then
             iRetCode = 5
+            close(iLUN)
             return
         end if
         
@@ -73,12 +77,47 @@ contains
         read(iLUN, iostat=iErrCode) this % iVersion
         if(iErrCode /= 0) then
             iRetCode = 6
+            close(iLUN)
             return
         end if
         if(this % iVersion /= 2) then
             iRetCode = 7
+            close(iLUN)
             return
         end if
+        
+        ! Get GRID section
+        read(iLUN, iostat=iErrCode) sID
+        if(iErrCode /= 0) then
+            iRetCode = 8
+            close(iLUN)
+            return
+        end if
+        if(sID /= "GRID") then
+            iRetCode = 9
+            close(iLUN)
+            return
+        end if
+        read(iLUN, iostat=iErrCode) iLength
+        if(iErrCode /= 0) then
+            iRetCode = 10
+            close(iLUN)
+            return
+        end if
+        if(iLength /= 72) then
+            iRetCode = 11
+            close(iLUN)
+            return
+        end if
+        
+        ! Get grid dimensions
+        read(iLUN, iostat=iErrCode) this % iNy, this % iNx
+        if(iErrCode /= 0) then
+            iRetCode = 12
+            close(iLUN)
+            return
+        end if
+        print *, this % iNy, this % iNx
         
         ! Leave
         close(iLUN)
