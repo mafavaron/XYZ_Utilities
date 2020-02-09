@@ -13,6 +13,8 @@ module grid_gen
     type grid_space
         character(len=256)                  :: sDataFileName
         integer                             :: iVersion
+        real(8)                             :: rX0
+        real(8)                             :: rY0
         real(8)                             :: rDeltaX
         real(8)                             :: rDeltaY
         integer                             :: iNx
@@ -117,7 +119,13 @@ contains
             close(iLUN)
             return
         end if
-        print *, this % iNy, this % iNx
+        read(iLUN, iostat=iErrCode) this % rX0, this % rY0
+        if(iErrCode /= 0) then
+            iRetCode = 13
+            close(iLUN)
+            return
+        end if
+        print *, this % rX0, this % rY0
         
         ! Leave
         close(iLUN)
