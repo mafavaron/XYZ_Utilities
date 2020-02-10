@@ -44,5 +44,23 @@ program test
     iRetCode = tGrid2 % fileWrite(10, sOutputFile)
     print *, "Test 2: Ret code from 'fileWrite' = ", iRetCode
 
+    ! Test 3: get grid from XYZ information (different than in test 2), then write it in a way allowing test from Surfer
+    k = 0
+    do i = 1, 101
+        do j = 1, 101
+            k = k + 1
+            rvX(k) = 0.2d0 * (i-1) - 10.d0
+            rvY(k) = 0.2d0 * (j-1) - 10.d0
+            rvConc(k) = 100.d0 * exp(-((rvY(k))/5.d0)**2 - ((rvX(k)-5.d0)/7.d0)**2)
+        end do
+    end do
+    iRetCode = tGrid2 % build(rvX, rvY, rvConc)
+    print *
+    print *, "Test 3: Data number = ", k
+    print *, "Test 3: Ret code from 'build'     = ", iRetCode
+    sOutputFile = ".\\out2.grd"
+    iRetCode = tGrid2 % fileWrite(10, sOutputFile)
+    print *, "Test 3: Ret code from 'fileWrite' = ", iRetCode
+
 end program test
 
