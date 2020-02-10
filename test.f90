@@ -36,6 +36,7 @@ program test
         end do
     end do
     iRetCode = tGrid2 % build(rvX, rvY, rvConc)
+    print *
     print *, "Test 2: Ret code = ", iRetCode
 
 end program test
