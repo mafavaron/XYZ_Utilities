@@ -32,9 +32,11 @@ program test
             k = k + 1
             rvX(k) = 0.2d0 * (i-1) - 10.d0
             rvY(k) = 0.2d0 * (j-1) - 10.d0
+            rvConc(k) = 100.d0 * exp(-(-(rvY(k)-5.d0)/5.d0 - rvX(k)/7.d0)**2)
         end do
     end do
-    print *, "Test 2: X and Y range = ", minval(rvX), maxval(rvY)
+    iRetCode = tGrid2 % build(rvX, rvY, rvZ)
+    print *, "Test 2: Ret code = ", iRetCode
 
 end program test
 
