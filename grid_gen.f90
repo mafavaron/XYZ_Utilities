@@ -269,12 +269,8 @@ contains
         write(iLUN) iLength
         k = 0
         do iY = 1, this % iNy
-            rY = this % rY0 + this % rDeltaY * (iY - 1)
             do iX = 1, this % iNx
-                rX = this % rX0 + this % rDeltaX * (iX - 1)
                 k = k + 1
-                this % rvX(k) = rX
-                this % rvY(k) = rY
                 write(iLUN) this % rvZ(k)
             end do
         end do
@@ -296,25 +292,80 @@ contains
         
         ! Locals
         integer         :: iErrCode
+        integer         :: i
         integer         :: n
         real(8)         :: rDeltaX
         real(8)         :: rDeltaY
+        real(8)         :: rDeltaXmin
+        real(8)         :: rDeltaYmin
         real(8)         :: rXmin
         real(8)         :: rYmin
+        integer         :: iNx
+        integer         :: iNy
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Initialize the grid version to an absurd value, meaning
+        ! "this grid is empty"
+        this % iVersion = -1
         
         ! Check there is something to do
         if(size(rvX) <= 0 .or. size(rvY) <= 0 .or. size(rvZ) <= 0) then
             iRetCode = 1
             return
         end if
-        n = size(rvConc)
+        n = size(rvZ)
         if(n /= size(rvX) .or. n /= size(rvY)) then
             iRetCode = 2
             return
         end if
+        
+        ! Get lower extrema
+        rXmin = minval(rvX)
+        rYmin = minval(rvY)
+        
+        ! Search the minimum non-zero displacement along
+        ! the two X and Y directions: they *could* be
+        ! the regular grid spacings.
+        rDeltaXmin = huge(rDeltaXmin)
+        rDeltaYmin = huge(rDeltaYmin)
+        do i = 1, n
+            rDeltaX = rvX(i) - rXmin
+            rDeltaY = rvY(i) - rYmin
+            if(rDeltaX > 0.d0 .and. rDeltaX < rDeltaXmin) rDeltaXmin = rDeltaX
+            if(rDeltaY > 0.d0 .and. rDeltaY < rDeltaYmin) rDeltaYmin = rDeltaY
+        end do
+        
+        ! Check the possible regular grid spacings really are: if so,
+        ! then any receptor displacement from the SW grid point is
+        ! an integer multiple of the "regular spacings". Which can be checked
+        ! easily by a bit of floating point arithmetics.
+        do i = 1, n
+            rDeltaX = rvX(i) - rXmin
+            rDeltaY = rvY(i) - rYmin
+            if(abs(mod(rDeltaX, rDeltaXmin)) > 1.d4 .or. abs(mod(rDeltaY, rDeltaYmin)) > 1.d4) then
+                iRetCode = 3
+                return
+            end if
+        end do
+        ! Post-condition: We can say it: The grid is regular! (Possibly consisting of 1 point only)
+        
+        ! Determine grid size along the X and Y directions
+        iNx = nint(maxval(rvX) / rDeltaXmin) + 1
+        iNy = nint(maxval(rvY) / rDeltaYmin) + 1
+        if(iNx <= 0 .or. iNy <= 0) then
+            iRetCode = 4
+            return
+        end if
+        
+        ! Assign the grid fields their values
+        this % rDeltaX = rDeltaXmin
+        this % rDeltaY = rDeltaYmin
+        this % rX0     = rXmin
+        this % rY0     = rYmin
+        
+        
         
     end function build
 
