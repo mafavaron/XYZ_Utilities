@@ -27,6 +27,7 @@ program test
     print *, "Test 1, step 2: Ret code = ", iRetCode
     
     ! Test 2: get grid from XYZ information, then write it in a way allowing test from Surfer
+    k = 0
     do i = 1, 101
         do j = 1, 101
             k = k + 1
@@ -35,6 +36,7 @@ program test
             rvConc(k) = 100.d0 * exp(-(-(rvY(k)-5.d0)/5.d0 - rvX(k)/7.d0)**2)
         end do
     end do
+    print *, "Test 2: Data number = ", k
     iRetCode = tGrid2 % build(rvX, rvY, rvConc)
     print *
     print *, "Test 2: Ret code = ", iRetCode
