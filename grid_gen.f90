@@ -8,6 +8,9 @@ module grid_gen
     
     public  :: grid_space
     
+    ! Constants
+    real(8), parameter  :: INVALID = 1.70141d+38
+    
     ! Data types
     
     type grid_space
@@ -209,6 +212,8 @@ contains
         ! Leave
         close(iLUN)
         
+        print *, "Invalid = ", this % rInvalid
+        
     end function fileRead
     
 
@@ -291,7 +296,6 @@ contains
         integer                             :: iRetCode
         
         ! Locals
-        integer         :: iErrCode
         integer         :: i
         integer         :: n
         real(8)         :: rDeltaX
@@ -302,6 +306,11 @@ contains
         real(8)         :: rYmin
         integer         :: iNx
         integer         :: iNy
+        integer         :: iX
+        integer         :: iY
+        real(8), dimension(:,:), allocatable    :: rmZ
+        real(8), dimension(:,:), allocatable    :: rmPackedX
+        real(8), dimension(:,:), allocatable    :: rmPackedY
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -359,12 +368,24 @@ contains
             return
         end if
         
+        ! Reserve workspace, and fill it with actual data (which might be incomplete)
+        allocate(rmPackedX(iNx, iNy), rmPackedY(iNx, iNy), rmZ(iNx, iNy))
+        rmZ       = INVALID
+        do i = 1, n
+            iX = nint((rvX(i) - rXmin) / rDeltaXmin) + 1
+            iY = nint((rvY(i) - rYmin) / rDeltaYmin) + 1
+            rmPackedX(iX, iY) = rvX(i)
+            rmPackedY(iX, iY) = rvY(i)
+            rmZ(iX, iY)       = rvZ(i)
+        end do
+        
         ! Assign the grid fields their values
         this % rDeltaX = rDeltaXmin
         this % rDeltaY = rDeltaYmin
         this % rX0     = rXmin
         this % rY0     = rYmin
-        
+        this % iNx     = iNx
+        this % iNy     = iNy
         
         
     end function build
