@@ -230,41 +230,42 @@ contains
         ! Assume success (will falsify on failure)
         iRetCode = 0
         
-        ! Try opening the file
-        open(iLUN, file=sFileName, status='unknown', action='write', access='stream', iostat=iErrCode)
-        if(iErrCode /= 0) then
+        ! Check something can be made
+        if(this % iVersion /= 2) then
             iRetCode = 1
             return
         end if
-        read(iLUN, iostat=iErrCode) "DSRB"
-        iLength = 4
-        read(iLUN, iostat=iErrCode) iLength
         
-        ! Get GRD version (should be 2)
-        read(iLUN, iostat=iErrCode) this % iVersion
-        
-        ! Get GRID section
-        read(iLUN, iostat=iErrCode) "GRID"
-        iLength = 72
-        read(iLUN, iostat=iErrCode) iLength
-        
-        ! Get grid dimensions
-        read(iLUN, iostat=iErrCode) this % iNy, this % iNx
-        read(iLUN, iostat=iErrCode) this % rX0, this % rY0
-        read(iLUN, iostat=iErrCode) this % rDeltaX, this % rDeltaY
-        read(iLUN, iostat=iErrCode) this % rZmin, this % rZmax
-        read(iLUN, iostat=iErrCode) this % rRotation
-        read(iLUN, iostat=iErrCode) this % rInvalid
-        
-        ! Get actual data
-        read(iLUN, iostat=iErrCode) "DATA"
-        read(iLUN, iostat=iErrCode) iLength
+        ! Try opening the file
+        open(iLUN, file=sFileName, status='unknown', action='write', access='stream', iostat=iErrCode)
         if(iErrCode /= 0) then
-            iRetCode = 20
-            close(iLUN)
+            iRetCode = 2
             return
         end if
+        write(iLUN) "DSRB"
+        iLength = 4
+        write(iLUN) iLength
+        
+        ! Get GRD version (should be 2)
+        write(iLUN) this % iVersion
+        
+        ! Get GRID section
+        write(iLUN) "GRID"
+        iLength = 72
+        write(iLUN) iLength
+        
+        ! Get grid dimensions
+        write(iLUN) this % iNy, this % iNx
+        write(iLUN) this % rX0, this % rY0
+        write(iLUN) this % rDeltaX, this % rDeltaY
+        write(iLUN) this % rZmin, this % rZmax
+        write(iLUN) this % rRotation
+        write(iLUN) this % rInvalid
+        
+        ! Get actual data
+        write(iLUN) "DATA"
         iLength = 8*(this % iNx * this % iNy)
+        write(iLUN) iLength
         k = 0
         do iY = 1, this % iNy
             rY = this % rY0 + this % rDeltaY * (iY - 1)
@@ -273,7 +274,7 @@ contains
                 k = k + 1
                 this % rvX(k) = rX
                 this % rvY(k) = rY
-                read(iLUN, iostat=iErrCode) this % rvZ(k)
+                write(iLUN) this % rvZ(k)
             end do
         end do
         
