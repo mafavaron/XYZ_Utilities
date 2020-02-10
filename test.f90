@@ -36,10 +36,13 @@ program test
             rvConc(k) = 100.d0 * exp(-(-(rvY(k)-5.d0)/5.d0 - rvX(k)/7.d0)**2)
         end do
     end do
-    print *, "Test 2: Data number = ", k
     iRetCode = tGrid2 % build(rvX, rvY, rvConc)
     print *
-    print *, "Test 2: Ret code = ", iRetCode
+    print *, "Test 2: Data number = ", k
+    print *, "Test 2: Ret code from 'build'     = ", iRetCode
+    sOutputFile = ".\\out2.grd"
+    iRetCode = tGrid2 % fileWrite(10, sOutputFile)
+    print *, "Test 2: Ret code from 'fileWrite' = ", iRetCode
 
 end program test
 
