@@ -8,6 +8,9 @@ module grid_gen
     
     public  :: grid_space
     
+    ! Constants
+    real(8), parameter  :: INVALID = 1.70141d+38
+    
     ! Data types
     
     type grid_space
@@ -209,6 +212,8 @@ contains
         ! Leave
         close(iLUN)
         
+        print *, "Invalid = ", this % rInvalid
+        
     end function fileRead
     
 
@@ -291,8 +296,9 @@ contains
         integer                             :: iRetCode
         
         ! Locals
-        integer         :: iErrCode
         integer         :: i
+        integer         :: j
+        integer         :: k
         integer         :: n
         real(8)         :: rDeltaX
         real(8)         :: rDeltaY
@@ -302,6 +308,11 @@ contains
         real(8)         :: rYmin
         integer         :: iNx
         integer         :: iNy
+        integer         :: iX
+        integer         :: iY
+        real(8), dimension(:,:), allocatable    :: rmZ
+        real(8), dimension(:,:), allocatable    :: rmPackedX
+        real(8), dimension(:,:), allocatable    :: rmPackedY
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
@@ -352,20 +363,60 @@ contains
         ! Post-condition: We can say it: The grid is regular! (Possibly consisting of 1 point only)
         
         ! Determine grid size along the X and Y directions
-        iNx = nint(maxval(rvX) / rDeltaXmin) + 1
-        iNy = nint(maxval(rvY) / rDeltaYmin) + 1
+        iNx = nint((maxval(rvX) - minval(rvX)) / rDeltaXmin) + 1
+        iNy = nint((maxval(rvY) - minval(rvY)) / rDeltaYmin) + 1
         if(iNx <= 0 .or. iNy <= 0) then
             iRetCode = 4
             return
         end if
         
+        ! Reserve workspace, and fill it with actual data (which might be incomplete)
+        allocate(rmPackedX(iNx, iNy), rmPackedY(iNx, iNy), rmZ(iNx, iNy))
+        rmZ       = INVALID
+        do i = 1, n
+            iX = nint((rvX(i) - rXmin) / rDeltaXmin) + 1
+            iY = nint((rvY(i) - rYmin) / rDeltaYmin) + 1
+            rmPackedX(iX, iY) = rvX(i)
+            rmPackedY(iX, iY) = rvY(i)
+            rmZ(iX, iY)       = rvZ(i)
+        end do
+        
         ! Assign the grid fields their values
-        this % rDeltaX = rDeltaXmin
-        this % rDeltaY = rDeltaYmin
-        this % rX0     = rXmin
-        this % rY0     = rYmin
+        this % rDeltaX   = rDeltaXmin
+        this % rDeltaY   = rDeltaYmin
+        this % rX0       = rXmin
+        this % rY0       = rYmin
+        this % iNx       = iNx
+        this % iNy       = iNy
+        this % rZmin     = minval(rmZ, mask=rmZ < INVALID)
+        this % rZmax     = maxval(rmZ, mask=rmZ < INVALID)
+        this % rInvalid  = INVALID
+        this % rRotation = 0.d0
         
+        ! Reserve grid workspace
+        if(allocated(this % rvX)) deallocate(this % rvX)
+        if(allocated(this % rvY)) deallocate(this % rvY)
+        if(allocated(this % rvZ)) deallocate(this % rvZ)
+        allocate(this % rvX(this % iNx * this % iNy))
+        allocate(this % rvY(this % iNx * this % iNy))
+        allocate(this % rvZ(this % iNx * this % iNy))
         
+        ! Gather data in the right order
+        k = 0
+        do j = 1, iNy
+            do i = 1, iNx
+                k = k + 1
+                this % rvX(k) = rmPackedX(i, j)
+                this % rvY(k) = rmPackedY(i, j)
+                this % rvZ(k) = rmZ(i, j)
+            end do
+        end do
+        
+        ! Confirm the grid is filled
+        this % iVersion = 2
+        
+        ! Reclaim workspace
+        deallocate(rmPackedX, rmPackedY, rmZ)
         
     end function build
 
