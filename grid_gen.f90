@@ -29,6 +29,7 @@ module grid_gen
     contains
         procedure, public                   :: fileRead
         procedure, public                   :: fileWrite
+        procedure, public                   :: build
     end type grid_space
     
 contains
@@ -214,7 +215,7 @@ contains
     function fileWrite(this, iLUN, sFileName) result(iRetCode)
     
         ! Routine arguments
-        class(grid_space), intent(inout)    :: this
+        class(grid_space), intent(in)       :: this
         integer, intent(in)                 :: iLUN
         character(len=*), intent(in)        :: sFileName
         integer                             :: iRetCode
@@ -282,5 +283,39 @@ contains
         close(iLUN)
         
     end function fileWrite
+    
+    
+    function build(this, rvX, rvY, rvZ) result(iRetCode)
+        
+        ! Routine arguments
+        class(grid_space), intent(inout)    :: this
+        real(8), dimension(:), intent(in)   :: rvX
+        real(8), dimension(:), intent(in)   :: rvY
+        real(8), dimension(:), intent(in)   :: rvZ
+        integer                             :: iRetCode
+        
+        ! Locals
+        integer         :: iErrCode
+        integer         :: n
+        real(8)         :: rDeltaX
+        real(8)         :: rDeltaY
+        real(8)         :: rXmin
+        real(8)         :: rYmin
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Check there is something to do
+        if(size(rvX) <= 0 .or. size(rvY) <= 0 .or. size(rvZ) <= 0) then
+            iRetCode = 1
+            return
+        end if
+        n = size(rvConc)
+        if(n /= size(rvX) .or. n /= size(rvY)) then
+            iRetCode = 2
+            return
+        end if
+        
+    end function build
 
 end module grid_gen
