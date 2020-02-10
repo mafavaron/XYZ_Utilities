@@ -220,10 +220,65 @@ contains
         integer                             :: iRetCode
         
         ! Locals
-        integer :: iErrCode
+        integer             :: iErrCode
+        character(len=4)    :: sID
+        integer             :: iLength
+        integer             :: iX, iY
+        integer             :: k
+        real(8)             :: rX, rY
         
         ! Assume success (will falsify on failure)
         iRetCode = 0
+        
+        ! Try opening the file
+        open(iLUN, file=sFileName, status='unknown', action='write', access='stream', iostat=iErrCode)
+        if(iErrCode /= 0) then
+            iRetCode = 1
+            return
+        end if
+        read(iLUN, iostat=iErrCode) "DSRB"
+        iLength = 4
+        read(iLUN, iostat=iErrCode) iLength
+        
+        ! Get GRD version (should be 2)
+        read(iLUN, iostat=iErrCode) this % iVersion
+        
+        ! Get GRID section
+        read(iLUN, iostat=iErrCode) "GRID"
+        iLength = 72
+        read(iLUN, iostat=iErrCode) iLength
+        
+        ! Get grid dimensions
+        read(iLUN, iostat=iErrCode) this % iNy, this % iNx
+        read(iLUN, iostat=iErrCode) this % rX0, this % rY0
+        read(iLUN, iostat=iErrCode) this % rDeltaX, this % rDeltaY
+        read(iLUN, iostat=iErrCode) this % rZmin, this % rZmax
+        read(iLUN, iostat=iErrCode) this % rRotation
+        read(iLUN, iostat=iErrCode) this % rInvalid
+        
+        ! Get actual data
+        read(iLUN, iostat=iErrCode) "DATA"
+        read(iLUN, iostat=iErrCode) iLength
+        if(iErrCode /= 0) then
+            iRetCode = 20
+            close(iLUN)
+            return
+        end if
+        iLength = 8*(this % iNx * this % iNy)
+        k = 0
+        do iY = 1, this % iNy
+            rY = this % rY0 + this % rDeltaY * (iY - 1)
+            do iX = 1, this % iNx
+                rX = this % rX0 + this % rDeltaX * (iX - 1)
+                k = k + 1
+                this % rvX(k) = rX
+                this % rvY(k) = rY
+                read(iLUN, iostat=iErrCode) this % rvZ(k)
+            end do
+        end do
+        
+        ! Leave
+        close(iLUN)
         
     end function fileWrite
 
