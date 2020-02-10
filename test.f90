@@ -35,7 +35,7 @@ program test
             rvConc(k) = 100.d0 * exp(-(-(rvY(k)-5.d0)/5.d0 - rvX(k)/7.d0)**2)
         end do
     end do
-    iRetCode = tGrid2 % build(rvX, rvY, rvZ)
+    iRetCode = tGrid2 % build(rvX, rvY, rvConc)
     print *, "Test 2: Ret code = ", iRetCode
 
 end program test
