@@ -264,8 +264,8 @@ contains
         
         ! Get actual data
         write(iLUN) "DATA"
-        write(iLUN) iLength
         iLength = 8*(this % iNx * this % iNy)
+        write(iLUN) iLength
         k = 0
         do iY = 1, this % iNy
             rY = this % rY0 + this % rDeltaY * (iY - 1)
