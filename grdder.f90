@@ -9,16 +9,18 @@ program grdder
     implicit none
     
     ! Locals
-    integer                :: iRetCode
-    real(8)                :: rX
-    real(8)                :: rY
-    real(8)                :: rXmin
-    real(8)                :: rYmin
-    real(8)                :: rXmax
-    real(8)                :: rYmax
-    character(len=256)    :: sInFile
-    character(len=256)    :: sOutFile
-    character(len=256)    :: sBuffer
+    integer                             :: iRetCode
+    real(8)                             :: rX
+    real(8)                             :: rY
+    real(8)                             :: rXmin
+    real(8)                             :: rYmin
+    real(8)                             :: rXmax
+    real(8)                             :: rYmax
+    integer                             :: iNumLines
+    integer                             :: iLine
+    character(len=256)                  :: sInFile
+    character(len=256)                  :: sOutFile
+    character(len=256)                  :: sBuffer
     real(8), dimension(:), allocatable  :: rvX
     real(8), dimension(:), allocatable  :: rvY
     real(8), dimension(:), allocatable  :: rvConc
@@ -95,7 +97,22 @@ program grdder
         print *, 'Error: Input file contains no useful lines'
         stop
     end if
+    
+    ! Reserve workspace and get actual lines
     rewind(10)
+    allocate(rvX(iNumLines), rvY(iNumLines), rvConc(iNumLines))
+    do iLine = 1, iNumLines
+        read(10, "(a)", iostat=iRetCode) sBuffer
+        if(iRetCode /= 0) exit
+        read(sBuffer, *, iostat=iRetCode) rX, rY
+        if(iRetCode /= 0) then
+            print *, 'Error: Input file is invalid'
+            stop
+        end if
+        if(rXmin <= rX .and. rX <= rXmax .and. rYmin <= rY .and. rY <= rYmax) then
+            iNumLines = iNumLines + 1
+        end if
+    end do
     close(10)
     
     open(11, file=sOutFile, status='unknown', action='write', iostat=iRetCode)
@@ -105,6 +122,7 @@ program grdder
     end if
     close(11)
     
-    ! -1- Leave
+    ! Leave
+    deallocate(rvX, rvY, rvConc)
     
 end program grdder
