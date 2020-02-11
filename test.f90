@@ -24,6 +24,8 @@ program test
     real(8)                     :: rGV
     real(8)                     :: rFAC2
     real(8)                     :: rNAD
+    real(8), dimension(101,101) :: rmX
+    real(8), dimension(101,101) :: rmY
     
     ! Test 1: read file, then write it with a different name. Should give the same map under Surfer
     sInputFile = ".\\out.grd"
@@ -80,6 +82,24 @@ program test
     rNAD  = NAD(rvX, rvY)
     print *
     print *, "Test 4: Comparisons, two identical series"
+    print *, "  FB    = ", rFB
+    print *, "  NMSE  = ", rNMSE
+    print *, "  GM    = ", rGM
+    print *, "  GV    = ", rGV
+    print *, "  FAC2  = ", rFAC2
+    print *, "  NAD   = ", rNAD
+
+    ! Test 5: comparer, two identical fields
+    call random_number(rmX)
+    rmY   = rmX
+    rFB   = FB(rmX, rmY)
+    rNMSE = NMSE(rmX, rmY)
+    rGM   = GM(rmX, rmY)
+    rGV   = GV(rmX, rmY)
+    rFAC2 = FAC2(rmX, rmY)
+    rNAD  = NAD(rmX, rmY)
+    print *
+    print *, "Test 5: Comparisons, two identical fields"
     print *, "  FB    = ", rFB
     print *, "  NMSE  = ", rNMSE
     print *, "  GM    = ", rGM
