@@ -24,6 +24,7 @@ program grdder
     real(8), dimension(:), allocatable  :: rvX
     real(8), dimension(:), allocatable  :: rvY
     real(8), dimension(:), allocatable  :: rvConc
+    type(grid_space)                    :: tGrid
     
     ! Get parameters
     if(command_argument_count() /= 6) then
@@ -113,12 +114,17 @@ program grdder
     end do
     close(10)
     
-    open(11, file=sOutFile, status='unknown', action='write', iostat=iRetCode)
+    ! Convert to GRD
+    iRetCode = tGrid % build(rvX, rvY, rvConc)
     if(iRetCode /= 0) then
-        print *, 'Error: Output file not opened'
+        print *, 'Error: Data not converted to grid. Return code = ', iRetCode
         stop
     end if
-    close(11)
+    iRetCode = tGrid % fileWrite(10, sOutFile)
+    if(iRetCode /= 0) then
+        print *, 'Error: Grid not written. Return code = ', iRetCode
+        stop
+    end if
     
     ! Leave
     deallocate(rvX, rvY, rvConc)
