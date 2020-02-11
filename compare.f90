@@ -54,7 +54,7 @@ contains
         real(8)                             :: rFB
         
         ! Locals
-        ! --none--
+        real(8) :: rDenom
         
         ! Check array dimensions
         if(size(rvA) /= size(rvB)) then
@@ -67,7 +67,12 @@ contains
         end if
         
         ! Compute the indicator
-        rFB = 2.d0 * (sum(rvA) - sum(rvB)) / (sum(rvA) + sum(rvB))
+        rDenom = (sum(rvA) + sum(rvB))
+        if(abs(rDenom) > 1.d-6) then
+            rFB = 2.d0 * (sum(rvA) - sum(rvB)) / rDenom
+        else
+            rFB = -9999.9d0
+        end if
         
     end function FB1
 
@@ -80,7 +85,7 @@ contains
         real(8)                             :: rFB
         
         ! Locals
-        ! --none--
+        real(8) :: rDenom
         
         ! Check array dimensions
         if(size(rmA) /= size(rmB)) then
@@ -93,7 +98,12 @@ contains
         end if
         
         ! Compute the indicator
-        rFB = 2.d0 * (sum(rmA) - sum(rmB)) / (sum(rmA) + sum(rmB))
+        rDenom = (sum(rmA) + sum(rmB))
+        if(abs(rDenom) > 1.d-6) then
+            rFB = 2.d0 * (sum(rmA) - sum(rmB)) / rDenom
+        else
+            rFB = -9999.9d0
+        end if
         
     end function FB2
 
