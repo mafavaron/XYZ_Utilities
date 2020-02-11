@@ -9,6 +9,7 @@ module compare
     public  :: NMSE
     public  :: GM
     public  :: GV
+    public  :: FAC2
     
     ! Polymorphic interfaces
     
@@ -31,6 +32,11 @@ module compare
         module procedure    :: GV1
         module procedure    :: GV2
     end interface GV
+
+    interface FAC2
+        module procedure    :: FAC2_1
+        module procedure    :: FAC2_2
+    end interface FAC2
 
 contains
 
@@ -260,5 +266,59 @@ contains
         end if
         
     end function GV2
+
+
+    function FAC2_1(rvA, rvB) result(rFAC2)
+    
+        ! Routine arguments
+        real(8), dimension(:), intent(in)   :: rvA
+        real(8), dimension(:), intent(in)   :: rvB
+        real(8)                             :: rFAC2
+        
+        ! Locals
+        integer :: m
+        
+        ! Check array dimensions
+        if(size(rvA) /= size(rvB)) then
+            rFAC2 = -9999.9d0
+            return
+        end if
+        if(size(rvA) <= 0) then
+            rFAC2 = -9999.9d0
+            return
+        end if
+        
+        ! Compute the indicator
+        m   = count(0.5d0*rvA <= rvB .and. rvB <= 2.d0*rvA)
+        rFAC2 = real(m, kind=8) / size(rvA)
+        
+    end function FAC2_1
+
+
+    function FAC2_2(rmA, rmB) result(rFAC2)
+    
+        ! Routine arguments
+        real(8), dimension(:,:), intent(in) :: rmA
+        real(8), dimension(:,:), intent(in) :: rmB
+        real(8)                             :: rFAC2
+        
+        ! Locals
+        integer :: m
+        
+        ! Check array dimensions
+        if(size(rmA) /= size(rmB)) then
+            rFAC2 = -9999.9d0
+            return
+        end if
+        if(size(rmA) <= 0) then
+            rFAC2 = -9999.9d0
+            return
+        end if
+        
+        ! Compute the indicator
+        m   = count(0.5d0*rmA <= rmB .and. rmB <= 2.d0*rmA)
+        rFAC2 = real(m, kind=8) / size(rmA)
+        
+    end function FAC2_2
 
 end module compare
