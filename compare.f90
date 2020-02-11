@@ -10,6 +10,7 @@ module compare
     public  :: GM
     public  :: GV
     public  :: FAC2
+    public  :: NAD
     
     ! Polymorphic interfaces
     
@@ -37,6 +38,11 @@ module compare
         module procedure    :: FAC2_1
         module procedure    :: FAC2_2
     end interface FAC2
+
+    interface NAD
+        module procedure    :: NAD1
+        module procedure    :: NAD2
+    end interface NAD
 
 contains
 
@@ -320,5 +326,57 @@ contains
         rFAC2 = real(m, kind=8) / size(rmA)
         
     end function FAC2_2
+
+
+    function NAD1(rvA, rvB) result(rNAD)
+    
+        ! Routine arguments
+        real(8), dimension(:), intent(in)   :: rvA
+        real(8), dimension(:), intent(in)   :: rvB
+        real(8)                             :: rNAD
+        
+        ! Locals
+        ! --none--
+        
+        ! Check array dimensions
+        if(size(rvA) /= size(rvB)) then
+            rNAD = -9999.9d0
+            return
+        end if
+        if(size(rvA) <= 0) then
+            rNAD = -9999.9d0
+            return
+        end if
+        
+        ! Compute the indicator
+        rNAD = sum(abs(rvA - rvB)) / (sum(rvA + rvB))
+        
+    end function NAD1
+
+
+    function NAD2(rmA, rmB) result(rNAD)
+    
+        ! Routine arguments
+        real(8), dimension(:,:), intent(in) :: rmA
+        real(8), dimension(:,:), intent(in) :: rmB
+        real(8)                             :: rNAD
+        
+        ! Locals
+        ! --none--
+        
+        ! Check array dimensions
+        if(size(rmA) /= size(rmB)) then
+            rNAD = -9999.9d0
+            return
+        end if
+        if(size(rmA) <= 0) then
+            rNAD = -9999.9d0
+            return
+        end if
+        
+        ! Compute the indicator
+        rNAD = sum(abs(rmA - rmB)) / (sum(rmA + rmB))
+        
+    end function NAD2
 
 end module compare
