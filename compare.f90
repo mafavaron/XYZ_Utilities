@@ -8,6 +8,7 @@ module compare
     public  :: FB
     public  :: NMSE
     public  :: GM
+    public  :: GV
     
     ! Polymorphic interfaces
     
@@ -25,6 +26,11 @@ module compare
         module procedure    :: GM1
         module procedure    :: GM2
     end interface GM
+
+    interface GV
+        module procedure    :: GV1
+        module procedure    :: GV2
+    end interface GV
 
 contains
 
@@ -192,5 +198,67 @@ contains
         end if
         
     end function GM2
+
+
+    function GV1(rvA, rvB) result(rGV)
+    
+        ! Routine arguments
+        real(8), dimension(:), intent(in)   :: rvA
+        real(8), dimension(:), intent(in)   :: rvB
+        real(8)                             :: rGV
+        
+        ! Locals
+        integer :: m
+        
+        ! Check array dimensions
+        if(size(rvA) /= size(rvB)) then
+            rGV = -9999.9d0
+            return
+        end if
+        if(size(rvA) <= 0) then
+            rGV = -9999.9d0
+            return
+        end if
+        
+        ! Compute the indicator
+        m   = count(rvA > 0.d0 .and. rvB > 0.d0)
+        if(m > 0) then
+            rGV = exp(((sum(log(rvA) - log(rvB))**2)) / m)
+        else
+            rGV = -9999.9d0
+        end if
+        
+    end function GV1
+
+
+    function GV2(rmA, rmB) result(rGV)
+    
+        ! Routine arguments
+        real(8), dimension(:,:), intent(in) :: rmA
+        real(8), dimension(:,:), intent(in) :: rmB
+        real(8)                             :: rGV
+        
+        ! Locals
+        integer :: m
+        
+        ! Check array dimensions
+        if(size(rmA) /= size(rmB)) then
+            rGV = -9999.9d0
+            return
+        end if
+        if(size(rmA) <= 0) then
+            rGV = -9999.9d0
+            return
+        end if
+        
+        ! Compute the indicator
+        m   = count(rmA > 0.d0 .and. rmB > 0.d0)
+        if(m > 0) then
+            rGV = exp(((sum(log(rmA) - log(rmB))**2)) / m)
+        else
+            rGV = -9999.9d0
+        end if
+        
+    end function GV2
 
 end module compare
