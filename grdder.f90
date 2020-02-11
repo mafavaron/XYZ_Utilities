@@ -101,16 +101,14 @@ program grdder
     ! Reserve workspace and get actual lines
     rewind(10)
     allocate(rvX(iNumLines), rvY(iNumLines), rvConc(iNumLines))
-    do iLine = 1, iNumLines
+    iLine = 0
+    do
         read(10, "(a)", iostat=iRetCode) sBuffer
         if(iRetCode /= 0) exit
-        read(sBuffer, *, iostat=iRetCode) rX, rY
-        if(iRetCode /= 0) then
-            print *, 'Error: Input file is invalid'
-            stop
-        end if
+        read(sBuffer, *) rX, rY
         if(rXmin <= rX .and. rX <= rXmax .and. rYmin <= rY .and. rY <= rYmax) then
-            iNumLines = iNumLines + 1
+            iLine = iLine + 1
+            read(sBuffer, *) rvX(iLine), rvY(iLine), rvConc(iLine)
         end if
     end do
     close(10)
