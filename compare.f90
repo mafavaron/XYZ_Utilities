@@ -116,7 +116,7 @@ contains
         real(8)                             :: rNMSE
         
         ! Locals
-        ! --none--
+        real(8)     :: rDenom
         
         ! Check array dimensions
         if(size(rvA) /= size(rvB)) then
@@ -129,7 +129,12 @@ contains
         end if
         
         ! Compute the indicator
-        rNMSE = sum((rvA - rvB)**2) / (sum(rvA) * sum(rvB))
+        rDenom = sum(rvA) * sum(rvB)
+        if(abs(rDenom) >= 1.d-6) then
+            rNMSE = sum((rvA - rvB)**2) / rDenom
+        else
+            rNMSE = -9999.9d0
+        end if
         
     end function NMSE1
 
@@ -142,7 +147,7 @@ contains
         real(8)                             :: rNMSE
         
         ! Locals
-        ! --none--
+        real(8)     :: rDenom
         
         ! Check array dimensions
         if(size(rmA) /= size(rmB)) then
@@ -155,7 +160,12 @@ contains
         end if
         
         ! Compute the indicator
-        rNMSE = sum((rmA - rmB)**2) / (sum(rmA) * sum(rmB))
+        rDenom = sum(rmA) * sum(rmB)
+        if(abs(rDenom) >= 1.d-6) then
+            rNMSE = sum((rmA - rmB)**2) / rDenom
+        else
+            rNMSE = -9999.9d0
+        end if
         
     end function NMSE2
 
