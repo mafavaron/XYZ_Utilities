@@ -356,7 +356,7 @@ contains
         real(8)                             :: rNAD
         
         ! Locals
-        ! --none--
+        real(8)     :: rDenom
         
         ! Check array dimensions
         if(size(rvA) /= size(rvB)) then
@@ -369,7 +369,12 @@ contains
         end if
         
         ! Compute the indicator
-        rNAD = sum(abs(rvA - rvB)) / (sum(rvA + rvB))
+        rDenom = sum(rvA + rvB)
+        if(abs(rDenom) >= 1.d-6) then
+            rNAD = sum(abs(rvA - rvB)) / rDenom
+        else
+            rNAD = -9999.9d0
+        end if
         
     end function NAD1
 
@@ -382,7 +387,7 @@ contains
         real(8)                             :: rNAD
         
         ! Locals
-        ! --none--
+        real(8)     :: rDenom
         
         ! Check array dimensions
         if(size(rmA) /= size(rmB)) then
@@ -395,7 +400,12 @@ contains
         end if
         
         ! Compute the indicator
-        rNAD = sum(abs(rmA - rmB)) / (sum(rmA + rmB))
+        rDenom = sum(rmA + rmB)
+        if(abs(rDenom) >= 1.d-6) then
+            rNAD = sum(abs(rmA - rmB)) / rDenom
+        else
+            rNAD = -9999.9d0
+        end if
         
     end function NAD2
 
