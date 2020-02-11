@@ -11,6 +11,12 @@ program compare_series
     character(len=256)                  :: sOutFile
     real(8), dimension(:), allocatable  :: rvA
     real(8), dimension(:), allocatable  :: rvB
+    real(8)                             :: rFB
+    real(8)                             :: rNMSE
+    real(8)                             :: rGM
+    real(8)                             :: rGV
+    real(8)                             :: rFAC2
+    real(8)                             :: rNAD
     
     ! Get parameters
     if(command_argument_count() /= 3) then
@@ -30,6 +36,44 @@ program compare_series
     call get_command_argument(3, sOutFile)
     
     ! Read the two series
+    iRetCode = read_series(10, sInFileA, rvA)
+    if(iRetCode /= 0) then
+        print *, "Error: Input file A not read - Return code = ", iRetCode
+        stop
+    end if
+    iRetCode = read_series(10, sInFileB, rvB)
+    if(iRetCode /= 0) then
+        print *, "Error: Input file B not read - Return code = ", iRetCode
+        stop
+    end if
+    
+    ! Check the two series have equal lengths (they should, for all
+    ! following calculations to make sense)
+    if(size(rvA) /= size(rvB)) then
+        print *, "Error: The two data series have different lengths"
+        stop
+    end if
+    
+    ! Compute the standard indices and write them to output
+    rFB   = FB(rvA, rvB)
+    rNMSE = NMSE(rvA, rvB)
+    rGM   = GM(rvA, rvB)
+    rGV   = GV(rvA, rvB)
+    rFAC2 = FAC2(rvA, rvB)
+    rNAD  = NAD(rvA, rvB)
+    open(10, file=sOutFile, status='unknown', action='write')
+    write(10, "('Report for series from files:')")
+    write(10, "('  Series A from ', a)") trim(sInFileA)
+    write(10, "('  Series B from ', a)") trim(sInFileB)
+    write(10, "(' ')")
+    write(10, "('Standard comparison indicators:')")
+    write(10, "('FB   = ', f11.5)") rFB
+    write(10, "('NMSE = ', f11.5)") rNMSE
+    write(10, "('GM   = ', f11.5)") rGM
+    write(10, "('GV   = ', f11.5)") rGV
+    write(10, "('FAC2 = ', f11.5)") rFAC2
+    write(10, "('NAD  = ', f11.5)") rNAD
+    close(10)
 
 contains
 
@@ -79,6 +123,9 @@ contains
             read(iLUN, "(a)") sBuffer
             read(sBuffer(21:), *) rvX(iLINE)
         end do
+        
+        ! Leave
+        close(iLUN)
         
     end function read_series
 
