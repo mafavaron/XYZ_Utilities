@@ -28,13 +28,13 @@ program grdder
     
     ! Get parameters
     if(command_argument_count() /= 6) then
-        print *, "grdder - Procedure for extracting a rectangular block"
-        print *, "         from an XYZ CSV file and converting it to"
-        print *, "         a Surfer GRD file"
+        print *, "xyz_2_grd - Procedure for extracting a rectangular block"
+        print *, "            from an XYZ CSV file and converting it to"
+        print *, "            a Surfer GRD file"
         print *
         print *, "Usage:"
         print *
-        print *, "  grdder <InFile> <Xmin> <Ymin> <Xmax> <Ymax> <GrdFile>"
+        print *, "  xyz_2_grd <InFile> <Xmin> <Ymin> <Xmax> <Ymax> <GrdFile>"
         print *
         print *, "Copyright 2020 by Servizi Territorio srl"
         print *, "                  All rights reserved"
@@ -99,8 +99,9 @@ program grdder
         stop
     end if
     
-    ! Reserve workspace and get actual lines
+    ! Reserve workspace and get actual lines (after skipping the first, of course)
     rewind(10)
+    read(10, "(a)") sBuffer
     allocate(rvX(iNumLines), rvY(iNumLines), rvConc(iNumLines))
     iLine = 0
     do
