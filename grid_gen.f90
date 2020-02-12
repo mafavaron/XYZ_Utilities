@@ -213,8 +213,6 @@ contains
         ! Leave
         close(iLUN)
         
-        print *, "Invalid = ", this % rInvalid
-        
     end function fileRead
     
 
