@@ -4,4 +4,5 @@ This space contains various utilities and libraries devoted to processing files 
 
 Two common formats are supported:
 * CSV raster, and
-* GRD Surfer version 2 grid files.
+* GRD Surfer version 2 binary grid files.
+
