@@ -33,6 +33,7 @@ module grid_gen
         procedure, public                   :: fileRead
         procedure, public                   :: fileWrite
         procedure, public                   :: build
+        procedure, public                   :: getData
     end type grid_space
     
 contains
@@ -419,5 +420,36 @@ contains
         deallocate(rmPackedX, rmPackedY, rmZ)
         
     end function build
+    
+    
+    function getData(this, rvZ) result(iRetCode)
+        
+        ! Routine arguments
+        class(grid_space), intent(in)                       :: this
+        real(8), dimension(:), allocatable, intent(inout)   :: rvZ
+        integer                                             :: iRetCode
+        
+        ! Locals
+        ! --none--
+        
+        ! Assume success (will falsify on failure)
+        iRetCode = 0
+        
+        ! Check something can be made
+        if(this % iVersion /= 2) then
+            iRetCode = 1
+            return
+        end if
+        if(size(this % rvZ) <= 0) then
+            iRetCode = 2
+            return
+        end if
+        
+        ! Reserve workspace, and fill it with data
+        if(allocated(rvZ)) deallocate(rvZ)
+        allocate(rvZ(size(this % rvZ)))
+        rvZ = this % rvZ
+        
+    end function getData
 
 end module grid_gen
